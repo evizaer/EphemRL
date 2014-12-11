@@ -127,10 +127,6 @@
       <Project>{64feaaad-4662-4156-a663-3fd8f9ae149d}</Project>
       <Name>Conflight</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\lib\AttachedCommandBehavior\AttachedCommandBehavior\AttachedCommandBehavior.csproj">
-      <Project>{ba852758-6682-4878-906a-917a1e75de16}</Project>
-      <Name>AttachedCommandBehavior</Name>
-    </ProjectReference>
     <ProjectReference Include="..\..\UtiliCS\UtiliCS.csproj">
       <Project>{5b6632c0-45f6-4470-8bc8-5066a243d37b}</Project>
       <Name>UtiliCS</Name>
