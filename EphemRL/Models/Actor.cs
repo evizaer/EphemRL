@@ -18,20 +18,30 @@ namespace EphemRL.Models
             set { if (_Health != value) { _Health = value; NotifyPropertyChanged(); } } 
         }
 
-        public int MaxHealth { get; set; }
+        private int _MaxHealth;
+        public int MaxHealth
+        {
+            get { return _MaxHealth; } 
+            set { if (_MaxHealth != value) { _MaxHealth = value; NotifyPropertyChanged(); } } 
+        }
 
-        public double HealthPct { get { return (double) Health/MaxHealth; }}
+        public ActorProto Proto { get; private set; }
+
+        public double HealthPct { get { return (double) Health / Proto.MaxHealth; }}
 
         public CroppedBitmap Sprite { get; set; }
 
         public List<SpellProto> Spells { get; set; }
 
-        public Actor()
+        public Actor(ActorProto proto, IEnumerable<SpellProto> allSpells)
         {
-            Health = MaxHealth = 10;
-            Sprite = Spritesheet.Get("Player");
+            Proto = proto;
 
-            Spells = new List<SpellProto>();
+            Health = MaxHealth = proto.MaxHealth;
+
+            Sprite = Spritesheet.Get(proto.SpriteKey);
+
+            Spells = allSpells.Where(s => proto.Spells.Contains(s.Name)).ToList();
         }
     }
 }

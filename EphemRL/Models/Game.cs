@@ -17,7 +17,8 @@ namespace EphemRL.Models
     public class Game : ViewModel
     {
         public List<TerrainProto> TerrainTypes { get; set; }
-        public List<SpellProto> Spells { get; set; } 
+        public List<SpellProto> Spells { get; set; }
+        public List<ActorProto> ActorProtos { get; set; } 
 
         public ObservableCollection<MapTile> Tiles { get; set; }
         public Actor PlayerActor { get; set; }
@@ -46,6 +47,7 @@ namespace EphemRL.Models
 
             TerrainTypes = ObjectLoader.LoadInstanceList<TerrainProto>(File.ReadAllText("Content\\terrain.cflt"));
             Spells = ObjectLoader.LoadInstanceList<SpellProto>(File.ReadAllText("Content\\spells.cflt"));
+            ActorProtos = ObjectLoader.LoadInstanceList<ActorProto>(File.ReadAllText("Content\\actors.cflt"));
 
             MapWidth = MapHeight = 20;
 
@@ -56,7 +58,7 @@ namespace EphemRL.Models
                                       .Do(t => Tiles.Add(t));
 
             var actorStartTile = Tiles.Where(t => t.Proto.IsPassable).Choose();
-            actorStartTile.Actor = PlayerActor = new Actor();
+            actorStartTile.Actor = PlayerActor = new Actor(ActorProtos.Single(ap => ap.Name == "You"), Spells);
             PlayerActor.Spells = Spells;
 
             ActorPlaces = new Dictionary<Actor, MapTile>

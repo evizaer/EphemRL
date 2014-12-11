@@ -3,9 +3,11 @@
 		Name: "You",
 		MaxHealth: 10,
 		Spells: ["Create Water", "Firebolt"]
+		SpriteKey: "Player"
 	},
 	{
-		Name: "Training Goblin",
+		Name: "Training Goblin"
 		MaxHealth: 5
+		SpriteKey: "Orc"
 	}
 ]
