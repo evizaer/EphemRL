@@ -1,0 +1,5 @@
+﻿960|Grass
+1152|Wall
+1181|Lava
+1245|Water
+128|Player

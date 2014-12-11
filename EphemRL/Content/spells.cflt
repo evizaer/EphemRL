@@ -1,0 +1,14 @@
+﻿[
+	{
+		Name: Create Water,
+		TileManaRequired: [{DX: 1, DY: 0}, {DX: 0, DY: 1}, {DX: -1, DY: 0}, {DX: 0, DY: -1}],
+		AggregateManaRequired: {Water: 3},
+		Target: Self
+	},
+	{
+		Name: Firebolt,
+		TileManaRequired: [{DX: 1, DY: 0, Mana: {Fire: 1}}],
+		Range: 4,
+		Target: Terrain
+	}
+]

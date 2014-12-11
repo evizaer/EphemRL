@@ -1,0 +1,11 @@
+﻿[
+	{
+		Name: "You",
+		MaxHealth: 10,
+		Spells: ["Create Water", "Firebolt"]
+	},
+	{
+		Name: "Training Goblin",
+		MaxHealth: 5
+	}
+]

@@ -1,0 +1,26 @@
+﻿[
+	{
+		Name: "Wall",
+		IsPassable: false,
+		SpriteKey: "Wall",
+		ManaCapacity: {Void: 1} 
+	},
+	{
+		Name: "Grass",
+		IsPassable: true,
+		SpriteKey: "Grass",
+		ManaCapacity: {Earth: 2, Life: 1} 
+	},
+	{
+		Name: "Lava",
+		IsPassable: true,
+		SpriteKey: "Lava",
+		ManaCapacity: {Fire: 2, Earth: 1}
+	},
+	{
+		Name: "Water",
+		IsPassable: true,
+		SpriteKey: "Water",
+		ManaCapacity: {Water: 2, Life: 1}
+	}
+]

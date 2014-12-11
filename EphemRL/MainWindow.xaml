@@ -1,0 +1,144 @@
+﻿<Window x:Class="EphemRL.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:m="clr-namespace:EphemRL.Models"
+        xmlns:c="clr-namespace:EphemRL.Converters"
+        xmlns:acb="clr-namespace:AttachedCommandBehavior;assembly=AttachedCommandBehavior"
+        Title="MainWindow" Height="350" Width="525"
+        SizeToContent="WidthAndHeight">
+    <Window.Resources>
+        <m:Game x:Key="Game" />
+        <c:HideIfNullConverter x:Key="HideIfNull" />
+        <c:PercentageToWidthConverter x:Key="PercentageToWidth" />
+        <c:ElementToColorConverter x:Key="ElementToColor" />
+        <BooleanToVisibilityConverter x:Key="BoolToVisibility" />
+    </Window.Resources>
+    <Window.DataContext>
+        <Binding Source="{StaticResource Game}" />
+    </Window.DataContext>
+    <Window.InputBindings>
+        <KeyBinding Command="{Binding MovePlayerCommand}" CommandParameter="MoveNorth" Key="w" />
+        <KeyBinding Command="{Binding MovePlayerCommand}" CommandParameter="MoveSouth" Key="s" />
+        <KeyBinding Command="{Binding MovePlayerCommand}" CommandParameter="MoveWest" Key="a" />
+        <KeyBinding Command="{Binding MovePlayerCommand}" CommandParameter="MoveEast" Key="d" />
+        <KeyBinding Command="{Binding NextSpellStateCommand}" CommandParameter="0" Key="D1" />
+        <KeyBinding Command="{Binding NextSpellStateCommand}" CommandParameter="1" Key="D2" />
+    </Window.InputBindings>
+    <StackPanel Orientation="Horizontal">
+        <!--Status Panel on the left.-->
+        <StackPanel Margin="5">
+            <StackPanel Orientation="Horizontal">
+                <Image Source="{Binding PlayerActor.Sprite}" />
+                <TextBlock FontWeight="Bold" FontSize="32">You</TextBlock>
+            </StackPanel>
+            <TextBlock>HP: <Run Text="{Binding PlayerActor.Health}" /> of <Run Text="{Binding PlayerActor.MaxHealth}" /></TextBlock>
+            <!--
+            <StackPanel Orientation="Horizontal" Visibility="{Binding MousedTile, Converter={StaticResource HideIfNull}}">
+                <Image Source="{Binding MousedTile.Sprite}" />
+                <TextBlock FontWeight="Bold" FontSize="32" Text="{Binding MousedTile.Type}" />
+            </StackPanel>
+            -->
+            <StackPanel Margin="5">
+            <TextBlock FontWeight="Bold">Spells</TextBlock>
+            <ItemsControl ItemsSource="{Binding SpellDeltas}">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate DataType="m:SpellCastDelta">
+                        <TextBlock Text="{Binding Spell.Name}" >
+                            <TextBlock.Style>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="Foreground" Value="DarkGray" />
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding IsCastable}" Value="true">
+                                            <Setter Property="Foreground" Value="Green" />
+                                            <Setter Property="FontWeight" Value="Bold" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </TextBlock.Style>
+                        </TextBlock>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+</StackPanel>
+        </StackPanel>
+        
+        <!-- The Map -->
+        <ItemsControl ItemsSource="{Binding Tiles}">
+            <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <Canvas Width="{Binding MapPixelWidth}" Height="{Binding MapPixelHeight}"/>
+                </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+            <ItemsControl.ItemTemplate>
+                <DataTemplate DataType="m:MapTile">
+                    <Canvas>
+                        <Border BorderThickness="1" Margin="-1" BorderBrush="Black">
+                            <Image Source="{Binding Sprite}" ToolTip="{Binding ToolTip}" />
+                        </Border>
+                        <Image Source="{Binding Actor.Sprite}" Visibility="{Binding Actor, Converter={StaticResource HideIfNull}}"/>
+                        <Rectangle Canvas.Top="0" Canvas.Left="0" Width="32" Height="4" Fill="Black" Visibility="{Binding Actor, Converter={StaticResource HideIfNull}}"/>
+                        <Rectangle Canvas.Top="1" Canvas.Left="1" Width="{Binding Actor.HealthPct, Converter={StaticResource PercentageToWidth}, ConverterParameter=30}" Height="2" Fill="Red" Visibility="{Binding Actor, Converter={StaticResource HideIfNull}}"/>
+
+                        <!-- Mana display -->
+                        <Border Canvas.Top="25" Canvas.Left="0" BorderThickness="2" BorderBrush="Black">
+                            <ItemsControl  ItemsSource="{Binding Mana.ManaUnits}">
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <StackPanel Orientation="Horizontal" />
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate DataType="m:ManaElement">
+                                        <Border Margin="-1" BorderThickness="1" BorderBrush="Black">
+                                            <Rectangle Width="5" Height="5" Fill="{Binding Converter={StaticResource ElementToColor}}" />
+                                        </Border>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </Border>
+
+                        <Rectangle Canvas.Top="0" Canvas.Left="0" Width="32" Height="32" Fill="White" Opacity="0.3" 
+                                   Visibility="{Binding IsSelectable, Converter={StaticResource BoolToVisibility}}">
+                            <Rectangle.InputBindings>
+                                <MouseBinding Gesture="LeftClick" 
+                                                     Command="{Binding Source={StaticResource Game}, Path=SelectTileCommand}" 
+                                                     CommandParameter="{Binding}" />
+                            </Rectangle.InputBindings>
+                            <Rectangle.Triggers>
+                                <EventTrigger RoutedEvent="Rectangle.Loaded">
+                                    <BeginStoryboard>
+                                        <Storyboard>
+                                            <DoubleAnimation Storyboard.TargetProperty="Opacity"
+                                                From="0.2" To="0.4" Duration="0:0:1" 
+                                                AutoReverse="True" RepeatBehavior="Forever" />
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </EventTrigger>
+                            </Rectangle.Triggers>
+                        </Rectangle>
+
+                        <Rectangle Canvas.Top="0" Canvas.Left="0" Width="32" Height="32" Stroke="GreenYellow" StrokeThickness="4" Visibility="{Binding IsSelected, Converter={StaticResource BoolToVisibility}}">
+                            <Rectangle.Triggers>
+                                <EventTrigger RoutedEvent="Rectangle.Loaded">
+                                    <BeginStoryboard>
+                                        <Storyboard>
+                                            <DoubleAnimation Storyboard.TargetProperty="Opacity"
+                                                From="0.5" To="1.0" Duration="0:0:2" 
+                                                AutoReverse="True" RepeatBehavior="Forever" />
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </EventTrigger>
+                            </Rectangle.Triggers>
+                        </Rectangle>
+                    </Canvas>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+            <ItemsControl.ItemContainerStyle>
+                <Style>
+                    <Setter Property="Canvas.Left" Value="{Binding PixelX}" />
+                    <Setter Property="Canvas.Top" Value="{Binding PixelY}" />
+                </Style>
+            </ItemsControl.ItemContainerStyle>
+        </ItemsControl>
+    </StackPanel>
+</Window>
