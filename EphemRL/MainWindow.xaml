@@ -3,7 +3,6 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:m="clr-namespace:EphemRL.Models"
         xmlns:c="clr-namespace:EphemRL.Converters"
-        xmlns:acb="clr-namespace:AttachedCommandBehavior;assembly=AttachedCommandBehavior"
         Title="MainWindow" Height="350" Width="525"
         SizeToContent="WidthAndHeight">
     <Window.Resources>
