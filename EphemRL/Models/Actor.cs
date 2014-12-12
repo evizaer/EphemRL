@@ -15,7 +15,7 @@ namespace EphemRL.Models
         public int Health
         {
             get { return _Health; } 
-            set { if (_Health != value) { _Health = value; NotifyPropertyChanged(); } } 
+            set { if (_Health != value) { _Health = value; NotifyPropertyChanged(); NotifyPropertyChanged("HealthPct"); } } 
         }
 
         private int _MaxHealth;

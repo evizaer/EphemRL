@@ -56,14 +56,17 @@ namespace EphemRL.Models
             Tiles = new ObservableCollection<MapTile>();
             Tiles.AddRange(0.To(MapWidth * MapHeight).Select(i => new MapTile(i % MapWidth, i / MapWidth, TerrainTypes.Choose())));
                                       
-
             var actorStartTile = Tiles.Where(t => t.Proto.IsPassable).Choose();
             actorStartTile.Actor = PlayerActor = new Actor(ActorProtos.Single(ap => ap.Name == "You"), Spells);
             PlayerActor.Spells = Spells;
 
+            var enemyTile = Tiles.Choose();
+            var enemy = enemyTile.Actor = new Actor(ActorProtos.Single(ap => ap.Name == "Orc"), Enumerable.Empty<SpellProto>());
+
             ActorPlaces = new Dictionary<Actor, MapTile>
             {
-                {PlayerActor, actorStartTile}
+                {PlayerActor, actorStartTile},
+                {enemy, enemyTile}
             };
 
             InputActions = new Dictionary<string, Action>
@@ -88,16 +91,22 @@ namespace EphemRL.Models
             {
                 var casterPosition = ActorPlaces[delta.Caster];
                 Tiles.Remove(casterPosition);
-                var newTile = new MapTile(casterPosition.X, casterPosition.Y,
-                    TerrainTypes.Single(tt => tt.Name == "Water"));
-                Tiles.Insert(newTile.Y * MapWidth + newTile.X, newTile);
 
+                var newTile = new MapTile(casterPosition.X, casterPosition.Y, TerrainTypes.Single(tt => tt.Name == "Water"));
+                Tiles.Insert(newTile.Y * MapWidth + newTile.X, newTile);
 
                 //TODO: Move all present actors and items to new tile.
                 newTile.Actor = delta.Caster;
 
                 ActorPlaces[delta.Caster] = newTile;
-            } 
+            }
+            else if (delta.Spell.Name == "Firebolt")
+            {
+                if (SelectedTile.Actor != null)
+                {
+                    SelectedTile.Actor.Health -= 3;
+                }
+            }
 
             EndTurn();
         }
@@ -122,8 +131,8 @@ namespace EphemRL.Models
             {
                 Caster = caster,
                 Spell = spell,
-                // TODO: Allow for other target tiles (like a target selected by the user or AI)
-                TargetTile = ActorPlaces[caster],
+                // TODO: TargetTile represents valid places where mana can be expended for this spell--doesn't yet. 
+                TargetTile = ActorPlaces[PlayerActor],
                 IsCastable = false
             };
 

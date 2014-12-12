@@ -6,7 +6,7 @@
 		SpriteKey: "Player"
 	},
 	{
-		Name: "Training Goblin"
+		Name: "Orc"
 		MaxHealth: 5
 		SpriteKey: "Orc"
 	}
