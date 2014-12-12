@@ -54,8 +54,8 @@ namespace EphemRL.Models
             SpellDeltas = new ObservableCollection<SpellCastDelta>();
 
             Tiles = new ObservableCollection<MapTile>();
-            0.To(MapWidth * MapHeight).Select(i => new MapTile(i % MapWidth, i / MapWidth, TerrainTypes.Choose()))
-                                      .Do(t => Tiles.Add(t));
+            Tiles.AddRange(0.To(MapWidth * MapHeight).Select(i => new MapTile(i % MapWidth, i / MapWidth, TerrainTypes.Choose())));
+                                      
 
             var actorStartTile = Tiles.Where(t => t.Proto.IsPassable).Choose();
             actorStartTile.Actor = PlayerActor = new Actor(ActorProtos.Single(ap => ap.Name == "You"), Spells);
@@ -106,8 +106,7 @@ namespace EphemRL.Models
         {
             SpellDeltas.Clear();
 
-            PlayerActor.Spells.Select(s => BuildSpellDelta(s, PlayerActor))
-                              .Do(sd => SpellDeltas.Add(sd));
+            SpellDeltas.AddRange(PlayerActor.Spells.Select(s => BuildSpellDelta(s, PlayerActor)));
         }
 
         private void EndTurn()

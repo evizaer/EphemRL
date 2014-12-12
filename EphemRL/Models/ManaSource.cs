@@ -40,18 +40,16 @@ namespace EphemRL.Models
 
         private void SetManaUnitsFrom(Dictionary<ManaElement, int> d)
         {
-            d.SelectMany(kv => kv.Value != 0 
-                                ? 0.To(kv.Value).Select(_ => kv.Key) 
-                                : Enumerable.Empty<ManaElement>())
-                    .Do(e => ManaUnits.Add(e));
+            ManaUnits.AddRange(d.SelectMany(kv => kv.Value != 0
+                                                ? 0.To(kv.Value).Select(_ => kv.Key)
+                								: Enumerable.Empty<ManaElement>()));
         }
 
         private void SetManaUnitsFrom(IEnumerable<int> a)
         {
-            a.SelectMany((manaCount, index) => manaCount > 0 
-                                         ? 0.To(manaCount).Select(_ => (ManaElement)index)
-                                         : Enumerable.Empty<ManaElement>())
-             .Do(e => ManaUnits.Add(e));
+            ManaUnits.AddRange(a.SelectMany((manaCount, index) => manaCount > 0 
+                                                                ? 0.To(manaCount).Select(_ => (ManaElement)index)
+                                         						: Enumerable.Empty<ManaElement>()));
         }
 
         private static int[] ManaDictToArray(Dictionary<ManaElement, int> d)
