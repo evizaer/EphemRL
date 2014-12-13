@@ -10,6 +10,7 @@
         <c:HideIfNullConverter x:Key="HideIfNull" />
         <c:PercentageToWidthConverter x:Key="PercentageToWidth" />
         <c:ElementToColorConverter x:Key="ElementToColor" />
+        <c:ShouldTileDisplayActorConverter x:Key="ShouldTileDisplayActor" />
         <BooleanToVisibilityConverter x:Key="BoolToVisibility" />
     </Window.Resources>
     <Window.DataContext>
@@ -38,27 +39,27 @@
             </StackPanel>
             -->
             <StackPanel Margin="5">
-            <TextBlock FontWeight="Bold">Spells</TextBlock>
-            <ItemsControl ItemsSource="{Binding SpellDeltas}">
-                <ItemsControl.ItemTemplate>
-                    <DataTemplate DataType="m:SpellCastDelta">
-                        <TextBlock Text="{Binding Spell.Name}" >
-                            <TextBlock.Style>
-                                <Style TargetType="TextBlock">
-                                    <Setter Property="Foreground" Value="DarkGray" />
-                                    <Style.Triggers>
-                                        <DataTrigger Binding="{Binding IsCastable}" Value="true">
-                                            <Setter Property="Foreground" Value="Green" />
-                                            <Setter Property="FontWeight" Value="Bold" />
-                                        </DataTrigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </TextBlock.Style>
-                        </TextBlock>
-                    </DataTemplate>
-                </ItemsControl.ItemTemplate>
-            </ItemsControl>
-</StackPanel>
+                <TextBlock FontWeight="Bold">Spells</TextBlock>
+                <ItemsControl ItemsSource="{Binding SpellDeltas}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate DataType="m:SpellCastDelta">
+                            <TextBlock Text="{Binding Spell.Name}" >
+                                <TextBlock.Style>
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="Foreground" Value="DarkGray" />
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding IsCastable}" Value="true">
+                                                <Setter Property="Foreground" Value="Green" />
+                                                <Setter Property="FontWeight" Value="Bold" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </TextBlock.Style>
+                            </TextBlock>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </StackPanel>
         </StackPanel>
         
         <!-- The Map -->
@@ -74,9 +75,16 @@
                         <Border BorderThickness="1" Margin="-1" BorderBrush="Black">
                             <Image Source="{Binding Sprite}" ToolTip="{Binding ToolTip}" />
                         </Border>
-                        <Image Source="{Binding Actor.Sprite}" Visibility="{Binding Actor, Converter={StaticResource HideIfNull}}"/>
-                        <Rectangle Canvas.Top="0" Canvas.Left="0" Width="32" Height="4" Fill="Black" Visibility="{Binding Actor, Converter={StaticResource HideIfNull}}"/>
+                        <Canvas Visibility="{Binding ShouldShowContents, Converter={StaticResource BoolToVisibility}}">
+                            <Image Source="{Binding Actor.Sprite}" />
+                            <Rectangle Canvas.Top="0" Canvas.Left="0" Width="32" Height="4" Fill="Black" />
+                            <Rectangle Canvas.Top="1" Canvas.Left="1" Width="{Binding Actor.HealthPct, Converter={StaticResource PercentageToWidth}, ConverterParameter=30}" Height="2" Fill="Red" />
+                        </Canvas>
+                        <!--
+                        <Image Source="{Binding Actor.Sprite}" Visibility="{Binding Converter={StaticResource ShouldTileDisplayActor}}"/>
+                        <Rectangle Canvas.Top="0" Canvas.Left="0" Width="32" Height="4" Fill="Black" Visibility="{Binding Converter={StaticResource ShouldTileDisplayActor}}"/>
                         <Rectangle Canvas.Top="1" Canvas.Left="1" Width="{Binding Actor.HealthPct, Converter={StaticResource PercentageToWidth}, ConverterParameter=30}" Height="2" Fill="Red" Visibility="{Binding Actor, Converter={StaticResource HideIfNull}}"/>
+                        -->
 
                         <!-- Mana display -->
                         <Border Canvas.Top="25" Canvas.Left="0" BorderThickness="2" BorderBrush="Black">
@@ -95,6 +103,9 @@
                                 </ItemsControl.ItemTemplate>
                             </ItemsControl>
                         </Border>
+
+                        <Rectangle Canvas.Top="0" Canvas.Left="0" Width="32" Height="32" Fill="Black" Opacity="0.5" 
+                                   Visibility="{Binding IsHidden, Converter={StaticResource BoolToVisibility}}" />
 
                         <Rectangle Canvas.Top="0" Canvas.Left="0" Width="32" Height="32" Fill="White" Opacity="0.3" 
                                    Visibility="{Binding IsSelectable, Converter={StaticResource BoolToVisibility}}">

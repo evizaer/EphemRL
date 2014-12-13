@@ -12,6 +12,7 @@ namespace EphemRL.Models
         public string SpriteKey { get; set; }
         public int MaxHealth { get; set; }
         public List<string> Spells { get; set; }
+        public int SightRange { get; set; }
 
         public ActorProto()
         {

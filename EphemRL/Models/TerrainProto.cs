@@ -14,5 +14,6 @@ namespace EphemRL.Models
         public string Name { get; set; }
         public string SpriteKey { get; set; }
         public bool IsPassable { get; set; }
+        public bool BlocksSight { get; set; }
     }
 }

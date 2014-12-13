@@ -4,10 +4,12 @@
 		MaxHealth: 10,
 		Spells: ["Create Water", "Firebolt"]
 		SpriteKey: "Player"
+		SightRange: 8
 	},
 	{
 		Name: "Orc"
 		MaxHealth: 5
 		SpriteKey: "Orc"
+		SightRange: 5
 	}
 ]
