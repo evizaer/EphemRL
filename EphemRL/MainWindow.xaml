@@ -80,11 +80,6 @@
                             <Rectangle Canvas.Top="0" Canvas.Left="0" Width="32" Height="4" Fill="Black" />
                             <Rectangle Canvas.Top="1" Canvas.Left="1" Width="{Binding Actor.HealthPct, Converter={StaticResource PercentageToWidth}, ConverterParameter=30}" Height="2" Fill="Red" />
                         </Canvas>
-                        <!--
-                        <Image Source="{Binding Actor.Sprite}" Visibility="{Binding Converter={StaticResource ShouldTileDisplayActor}}"/>
-                        <Rectangle Canvas.Top="0" Canvas.Left="0" Width="32" Height="4" Fill="Black" Visibility="{Binding Converter={StaticResource ShouldTileDisplayActor}}"/>
-                        <Rectangle Canvas.Top="1" Canvas.Left="1" Width="{Binding Actor.HealthPct, Converter={StaticResource PercentageToWidth}, ConverterParameter=30}" Height="2" Fill="Red" Visibility="{Binding Actor, Converter={StaticResource HideIfNull}}"/>
-                        -->
 
                         <!-- Mana display -->
                         <Border Canvas.Top="25" Canvas.Left="0" BorderThickness="2" BorderBrush="Black">
@@ -104,7 +99,7 @@
                             </ItemsControl>
                         </Border>
 
-                        <Rectangle Canvas.Top="0" Canvas.Left="0" Width="32" Height="32" Fill="Black" Opacity="0.5" 
+                        <Rectangle Canvas.Top="0" Canvas.Left="0" Width="32" Height="32" Fill="Black" Opacity="0.7" 
                                    Visibility="{Binding IsHidden, Converter={StaticResource BoolToVisibility}}" />
 
                         <Rectangle Canvas.Top="0" Canvas.Left="0" Width="32" Height="32" Fill="White" Opacity="0.3" 

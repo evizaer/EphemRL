@@ -7,6 +7,7 @@ using System.IO;
 using System.Linq;
 using Conflight;
 using UtiliCS;
+using EphemRL.Helpers;
 
 namespace EphemRL.Models
 {
@@ -126,77 +127,9 @@ namespace EphemRL.Models
             PopulateSpellDeltas();
 
             Tiles.Do(t => t.IsHidden = true);
-            CalculateLineOfSight(PlayerActor).Do(t => t.IsHidden = false);
+            LineOfSight.Calculate(Tiles, ActorPlaces[PlayerActor], (_, src) => GetAdjacentTiles(src)).Do(t => t.IsHidden = false);
         }
 
-        private IEnumerable<MapTile> CalculateLineOfSight(Actor a) 
-        {
-            var tilesProcessed = new HashSet<MapTile>();
-
-            var frontier = new UniqueQueue<MapTile>();
-
-            var visibleTiles = new HashSet<MapTile>();
-
-            var sourceTile = ActorPlaces[a];
-
-            visibleTiles.Add(sourceTile);
-            yield return sourceTile;
-
-            frontier.EnqueueAll(GetAdjacentTiles(sourceTile));
-
-            while (!frontier.IsEmpty)
-            {
-                var cur = frontier.Dequeue();
-
-                // Don't reprocess tiles we've already decided on.
-                if (tilesProcessed.Contains(cur)) continue;
-
-                tilesProcessed.Add(cur);
-
-                var curDistanceToSource = cur.DistanceTo(sourceTile);
-
-                List<MapTile> nextTiles = new List<MapTile>();
-
-                // Loop through adjacent tiles to
-                //  * Find the tile nearest to the actor for whom we're determining LoS. This is the tile from which visibility is traced.
-                //  * Find all tiles further away from the actor, so we can enqueue them. LoS is potentially traced through me to these 
-                //    adjacent tiles.
-                MapTile tileNearestToSource = null;
-                var minDistanceToSource = double.MaxValue;
-                foreach (var tile in GetAdjacentTiles(cur))
-                {
-                    var distanceToSource = tile.DistanceTo(sourceTile);
-
-                    if (distanceToSource > a.Proto.SightRange) continue;
-
-                    if (tileNearestToSource == null || distanceToSource < minDistanceToSource)
-                    {
-                        tileNearestToSource = tile;
-                        minDistanceToSource = distanceToSource;
-                    } 
-                    
-                    if (curDistanceToSource < distanceToSource)
-                    {
-                        nextTiles.Add(tile);
-                    }
-                }
-
-                // If the adjacent tile to me nearest to the source is visible, I am also visible.
-                if (visibleTiles.Contains(tileNearestToSource) && !tileNearestToSource.Proto.BlocksSight)
-                {
-                    yield return cur;
-                    visibleTiles.Add(cur);
-
-                    // Enqueue all adjacent tiles further away from the source than I am, unless I block sight.
-                    // Tiles behind a tile that blocks sight could potentially only be seen if another tile can have visibility traced
-                    // through it to that tile.
-                    if (!cur.Proto.BlocksSight) 
-                    {
-                        frontier.EnqueueAll(nextTiles);
-                    }
-                }
-            }
-        }
 
         private SpellCastDelta BuildSpellDelta(SpellProto spell, Actor caster)
         {
