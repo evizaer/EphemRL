@@ -32,12 +32,6 @@
                 <TextBlock FontWeight="Bold" FontSize="32">You</TextBlock>
             </StackPanel>
             <TextBlock>HP: <Run Text="{Binding PlayerActor.Health}" /> of <Run Text="{Binding PlayerActor.MaxHealth}" /></TextBlock>
-            <!--
-            <StackPanel Orientation="Horizontal" Visibility="{Binding MousedTile, Converter={StaticResource HideIfNull}}">
-                <Image Source="{Binding MousedTile.Sprite}" />
-                <TextBlock FontWeight="Bold" FontSize="32" Text="{Binding MousedTile.Type}" />
-            </StackPanel>
-            -->
             <StackPanel Margin="5">
                 <TextBlock FontWeight="Bold">Spells</TextBlock>
                 <ItemsControl ItemsSource="{Binding SpellDeltas}">
@@ -63,10 +57,10 @@
         </StackPanel>
         
         <!-- The Map -->
-        <ItemsControl ItemsSource="{Binding Tiles}">
+        <ItemsControl ItemsSource="{Binding Map.Tiles}">
             <ItemsControl.ItemsPanel>
                 <ItemsPanelTemplate>
-                    <Canvas Width="{Binding MapPixelWidth}" Height="{Binding MapPixelHeight}"/>
+                    <Canvas Width="{Binding Map.PixelWidth}" Height="{Binding Map.PixelHeight}"/>
                 </ItemsPanelTemplate>
             </ItemsControl.ItemsPanel>
             <ItemsControl.ItemTemplate>

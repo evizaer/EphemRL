@@ -17,26 +17,18 @@ namespace EphemRL.Models
 
     public class Game : ViewModel
     {
-        public List<TerrainProto> TerrainTypes { get; set; }
         public List<SpellProto> Spells { get; set; }
         public List<ActorProto> ActorProtos { get; set; } 
 
-        public ObservableCollection<MapTile> Tiles { get; set; }
         public Actor PlayerActor { get; set; }
 
-        public Dictionary<Actor, MapTile> ActorPlaces { get; set; }
-
         public ObservableCollection<SpellCastDelta> SpellDeltas { get; set; } 
-
-        public int MapWidth { get; set; }
-        public int MapHeight { get; set; }
-
-        public int MapPixelWidth { get { return MapWidth*MapTile.TileSize; } }
-        public int MapPixelHeight { get { return MapHeight*MapTile.TileSize; } }
 
         public MapTile SelectedTile { get; set; }
 
         public InputMode Mode { get; set; }
+
+        public Map Map { get; set; }
 
         public Game()
         {
@@ -46,36 +38,24 @@ namespace EphemRL.Models
             // spritesheet is 64 tiles wide. tiles are 32 pixels wide.
             Spritesheet.Build("Content\\tiles.png", "Content\\sprites.txt", 32);
 
-            TerrainTypes = ObjectLoader.LoadInstanceList<TerrainProto>(File.ReadAllText("Content\\terrain.cflt"));
             Spells = ObjectLoader.LoadInstanceList<SpellProto>(File.ReadAllText("Content\\spells.cflt"));
             ActorProtos = ObjectLoader.LoadInstanceList<ActorProto>(File.ReadAllText("Content\\actors.cflt"));
 
-            MapWidth = MapHeight = 20;
-
             SpellDeltas = new ObservableCollection<SpellCastDelta>();
 
-            Tiles = new ObservableCollection<MapTile>();
-            Tiles.AddRange(0.To(MapWidth * MapHeight).Select(i => new MapTile(i % MapWidth, i / MapWidth, TerrainTypes.Choose())));
-                                      
-            var actorStartTile = Tiles.Where(t => t.Proto.IsPassable).Choose();
-            actorStartTile.Actor = PlayerActor = new Actor(ActorProtos.Single(ap => ap.Name == "You"), Spells);
-            PlayerActor.Spells = Spells;
+            var terrainTypes = ObjectLoader.LoadInstanceList<TerrainProto>(File.ReadAllText("Content\\terrain.cflt"));
+            Map = new Map(terrainTypes);
 
-            var enemyTile = Tiles.Choose();
-            var enemy = enemyTile.Actor = new Actor(ActorProtos.Single(ap => ap.Name == "Orc"), Enumerable.Empty<SpellProto>());
+            Map.SpawnActor(PlayerActor = new Actor(ActorProtos.Single(ap => ap.Name == "You"), Spells));
 
-            ActorPlaces = new Dictionary<Actor, MapTile>
-            {
-                {PlayerActor, actorStartTile},
-                {enemy, enemyTile}
-            };
+            Map.SpawnActor(new Actor(ActorProtos.Single(ap => ap.Name == "Orc"), Enumerable.Empty<SpellProto>()));
 
             InputActions = new Dictionary<string, Action>
             {
-                {"MoveNorth", () => { MoveActorBy(PlayerActor, 0, -1); EndTurn(); }},
-                {"MoveWest", () => { MoveActorBy(PlayerActor, -1, 0); EndTurn(); }},
-                {"MoveEast", () => { MoveActorBy(PlayerActor, 1, 0); EndTurn(); }},
-                {"MoveSouth", () => { MoveActorBy(PlayerActor, 0, 1); EndTurn(); }},
+                {"MoveNorth", () => { Map.MoveActorBy(PlayerActor, 0, -1); EndTurn(); }},
+                {"MoveWest", () => { Map.MoveActorBy(PlayerActor, -1, 0); EndTurn(); }},
+                {"MoveEast", () => { Map.MoveActorBy(PlayerActor, 1, 0); EndTurn(); }},
+                {"MoveSouth", () => { Map.MoveActorBy(PlayerActor, 0, 1); EndTurn(); }},
             };
 
             SelectableTiles = new List<MapTile>();
@@ -90,16 +70,7 @@ namespace EphemRL.Models
             //TODO: Further refactor this into some kind of static spell resolution class, provide calling details in spells.cflt.
             if (delta.Spell.Name == "Create Water")
             {
-                var casterPosition = ActorPlaces[delta.Caster];
-                Tiles.Remove(casterPosition);
-
-                var newTile = new MapTile(casterPosition.X, casterPosition.Y, TerrainTypes.Single(tt => tt.Name == "Water"));
-                Tiles.Insert(newTile.Y * MapWidth + newTile.X, newTile);
-
-                //TODO: Move all present actors and items to new tile.
-                newTile.Actor = delta.Caster;
-
-                ActorPlaces[delta.Caster] = newTile;
+                Map.ChangeTerrainOf(Map.GetActorTile(delta.Caster), "Water");
             }
             else if (delta.Spell.Name == "Firebolt")
             {
@@ -126,10 +97,8 @@ namespace EphemRL.Models
 
             PopulateSpellDeltas();
 
-            Tiles.Do(t => t.IsHidden = true);
-            LineOfSight.Calculate(Tiles, ActorPlaces[PlayerActor], (_, src) => GetAdjacentTiles(src)).Do(t => t.IsHidden = false);
+            Map.SetTileVisibilityForLineOfSight(PlayerActor);
         }
-
 
         private SpellCastDelta BuildSpellDelta(SpellProto spell, Actor caster)
         {
@@ -138,7 +107,7 @@ namespace EphemRL.Models
                 Caster = caster,
                 Spell = spell,
                 // TODO: TargetTile represents valid places where mana can be expended for this spell--doesn't yet. 
-                TargetTile = ActorPlaces[PlayerActor],
+                TargetTile = Map.GetActorTile(PlayerActor),
                 IsCastable = false
             };
 
@@ -161,9 +130,9 @@ namespace EphemRL.Models
             {
                 int x = result.TargetTile.X + requirement.DX, y = result.TargetTile.Y + requirement.DY;
 
-                if (x >= 0 && x < MapWidth && y >= 0 && y < MapHeight)
+                if (x >= 0 && x < Map.Width && y >= 0 && y < Map.Height)
                 {
-                    var tile = GetTileAt(x, y);
+                    var tile = Map.GetTileAt(x, y);
 
                     // First, expend mana on this tile for any tile-specific requirements.
                     if (requirement.Mana != null)
@@ -226,41 +195,6 @@ namespace EphemRL.Models
             delta.ManaDelta.Do((tile, mana) => tile.Mana.Expend(mana));
         }
 
-        public void MoveActorBy(Actor actor, int dx, int dy)
-        {
-            var t = ActorPlaces[actor];
-
-            var x = t.X + dx;
-            var y = t.Y + dy;
-
-            MoveActorTo(actor, x, y);
-        }
-
-        public void MoveActorTo(Actor actor, int x, int y)
-        {
-            x = x.Clamp(0, MapWidth - 1);
-            y = y.Clamp(0, MapHeight - 1);
-
-            var targetTile = GetTileAt(x, y);
-            if (targetTile.Proto.IsPassable)
-            {
-                ActorPlaces[actor].Actor = null;
-                ActorPlaces[actor] = targetTile;
-
-                targetTile.Actor = actor;
-                if (targetTile.Proto.Name == "Lava") actor.Health--;
-                Debug.WriteLine("Player moved to {0}, {1}", targetTile.X, targetTile.Y);
-            }
-            else
-            {
-                Debug.WriteLine("Player move to {0}, {1} cancelled due to impassability.", targetTile.X, targetTile.Y);
-            }
-        }
-
-        public MapTile GetTileAt(int x, int y)
-        {
-            return Tiles.GetAt(x, y, MapWidth);
-        }
 
 
         public List<MapTile> SelectableTiles { get; set; } 
@@ -313,7 +247,7 @@ namespace EphemRL.Models
 
         public void MarkSelectableTilesFor(SpellCastDelta delta)
         {
-            var origin = ActorPlaces[delta.Caster];
+            var origin = Map.GetActorTile(delta.Caster);
 
             var frontier = new Queue<MapTile>();
             frontier.Enqueue(origin);
@@ -324,31 +258,11 @@ namespace EphemRL.Models
 
                 MarkAsSelectable(cur);
 
-                GetAdjacentTiles(cur).Where(t => !SelectableTiles.Contains(t) 
-                                         && delta.Spell.Range >= t.DistanceTo(origin))
-                                     .Do(frontier.Enqueue);
+                Map.GetAdjacentTiles(cur).Where(t => !SelectableTiles.Contains(t) 
+                                             && delta.Spell.Range >= t.DistanceTo(origin))
+                                         .Do(frontier.Enqueue);
             }
         }
-
-        public static List<Tuple<int, int>> AdjacencyDeltas =  new List<Tuple<int, int>>
-        {
-            Tuple.Create(1, 0), Tuple.Create(1, 1), Tuple.Create(0, 1), 
-            Tuple.Create(-1, 0), Tuple.Create(-1, -1), Tuple.Create(0, -1),
-            Tuple.Create(-1, 1), Tuple.Create(1, -1)
-        };
-
-        public IEnumerable<MapTile> GetAdjacentTiles(MapTile t)
-        {
-            foreach (var delta in AdjacencyDeltas)
-            {
-                int newX = t.X + delta.Item1, newY = t.Y + delta.Item2;
-
-                if (newX >= 0 && newX < MapWidth && newY >= 0 && newY < MapHeight)
-                {
-                    yield return GetTileAt(newX, newY);
-                }
-            }
-        }  
 
         public void MarkAsSelectable(MapTile tile)
         {
