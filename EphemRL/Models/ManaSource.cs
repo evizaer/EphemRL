@@ -113,6 +113,16 @@ namespace EphemRL.Models
             return false;
         }
 
+        public void Regenerate(ManaElement e)
+        {
+            int i = (int)e;
+            if (_Mana[i] < _Capacity[i])
+            {
+                _Mana[i]++;
+                ManaUnits.Add((ManaElement)i);
+            }
+        }
+
         public bool HasAny(ManaElement e)
         {
             return _Mana[(int)e] > 0;

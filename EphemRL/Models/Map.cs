@@ -162,6 +162,11 @@ namespace EphemRL.Models
                     yield return GetTileAt(newX, newY);
                 }
             }
-        }  
+        }
+
+        public void RegenerateMana(ManaElement e)
+        {
+            Tiles.Do(t => t.Mana.Regenerate(e));
+        }
     }
 }

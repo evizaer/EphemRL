@@ -30,9 +30,12 @@ namespace EphemRL.Models
 
         public Map Map { get; set; }
 
+        public ManaElement RegenPhase { get; set; }
+
         public Game()
         {
             Mode = InputMode.Normal;
+            RegenPhase = ManaElement.Fire;
            
             // 832 is start index of terrain tile graphics.
             // spritesheet is 64 tiles wide. tiles are 32 pixels wide.
@@ -95,9 +98,18 @@ namespace EphemRL.Models
             UnselectAllTiles();
             Mode = InputMode.Normal;
 
+
             PopulateSpellDeltas();
 
             Map.SetTileVisibilityForLineOfSight(PlayerActor);
+
+            Map.RegenerateMana(RegenPhase);
+
+            int phaseNumber = (int)RegenPhase + 1;
+            if (phaseNumber >= GetElements().Count()) {
+                phaseNumber = 0;
+            }
+            RegenPhase = (ManaElement)(phaseNumber);
         }
 
         private SpellCastDelta BuildSpellDelta(SpellProto spell, Actor caster)
