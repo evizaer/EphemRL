@@ -22,6 +22,8 @@ namespace EphemRL.Models
 
         public Actor PlayerActor { get; set; }
 
+        public ManaClock Clock { get; set; }
+
         public ObservableCollection<SpellCastDelta> SpellDeltas { get; set; } 
 
         public MapTile SelectedTile { get; set; }
@@ -35,8 +37,9 @@ namespace EphemRL.Models
         public Game()
         {
             Mode = InputMode.Normal;
-            RegenPhase = ManaElement.Fire;
-           
+
+            Clock = new ManaClock(GetElements());
+
             // 832 is start index of terrain tile graphics.
             // spritesheet is 64 tiles wide. tiles are 32 pixels wide.
             Spritesheet.Build("Content\\tiles.png", "Content\\sprites.txt", 32);
@@ -98,18 +101,11 @@ namespace EphemRL.Models
             UnselectAllTiles();
             Mode = InputMode.Normal;
 
-
             PopulateSpellDeltas();
 
             Map.SetTileVisibilityForLineOfSight(PlayerActor);
 
-            Map.RegenerateMana(RegenPhase);
-
-            int phaseNumber = (int)RegenPhase + 1;
-            if (phaseNumber >= GetElements().Count()) {
-                phaseNumber = 0;
-            }
-            RegenPhase = (ManaElement)(phaseNumber);
+            Map.RegenerateMana(Clock.Tick());
         }
 
         private SpellCastDelta BuildSpellDelta(SpellProto spell, Actor caster)
