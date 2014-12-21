@@ -168,5 +168,10 @@ namespace EphemRL.Models
         {
             Tiles.Do(t => t.Mana.Regenerate(e));
         }
+
+        public void ExpendManaForSpell(SpellCastDelta delta)
+        {
+            delta.ManaDelta.Do((tile, mana) => tile.Mana.Expend(mana));
+        }
     }
 }

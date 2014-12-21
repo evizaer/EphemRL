@@ -18,7 +18,11 @@ namespace EphemRL.Models
     public class Game : ViewModel
     {
         public List<SpellProto> Spells { get; set; }
-        public List<ActorProto> ActorProtos { get; set; } 
+        public List<ActorProto> ActorProtos { get; set; }
+
+        public Dictionary<SpellProto, string> SpellHotkeys { get; set; }
+
+        public static List<string> PossibleSpellHotkeys = new List<string> { "1", "2", "3", "4", "Q", "E" }; 
 
         public Actor PlayerActor { get; set; }
 
@@ -49,10 +53,13 @@ namespace EphemRL.Models
 
             SpellDeltas = new ObservableCollection<SpellCastDelta>();
 
+
             var terrainTypes = ObjectLoader.LoadInstanceList<TerrainProto>(File.ReadAllText("Content\\terrain.cflt"));
             Map = new Map(terrainTypes);
 
             Map.SpawnActor(PlayerActor = new Actor(ActorProtos.Single(ap => ap.Name == "You"), Spells));
+            SpellHotkeys = PlayerActor.Spells.Zip(PossibleSpellHotkeys, (spell, hotkey) => new { Hotkey = hotkey, Spell = spell })
+                                               .ToDictionary(o => o.Spell, o => o.Hotkey);
 
             Map.SpawnActor(new Actor(ActorProtos.Single(ap => ap.Name == "Orc"), Enumerable.Empty<SpellProto>()));
 
@@ -71,7 +78,7 @@ namespace EphemRL.Models
         
         public void ResolveSpell(SpellCastDelta delta)
         {
-            ExpendManaForSpell(delta);
+            Map.ExpendManaForSpell(delta);
 
             //TODO: Further refactor this into some kind of static spell resolution class, provide calling details in spells.cflt.
             if (delta.Spell.Name == "Create Water")
@@ -93,7 +100,8 @@ namespace EphemRL.Models
         {
             SpellDeltas.Clear();
 
-            SpellDeltas.AddRange(PlayerActor.Spells.Select(s => BuildSpellDelta(s, PlayerActor)));
+            SpellDeltas.AddRange(PlayerActor.Spells.Select(s => BuildSpellDelta(s, PlayerActor, 
+                                                                SpellHotkeys.ContainsKey(s) ? SpellHotkeys[s] : null)));
         }
 
         private void EndTurn()
@@ -108,12 +116,13 @@ namespace EphemRL.Models
             Map.RegenerateMana(Clock.Tick());
         }
 
-        private SpellCastDelta BuildSpellDelta(SpellProto spell, Actor caster)
+        private SpellCastDelta BuildSpellDelta(SpellProto spell, Actor caster, string hotkey)
         {
             var result = new SpellCastDelta
             {
                 Caster = caster,
                 Spell = spell,
+                Hotkey = hotkey,
                 // TODO: TargetTile represents valid places where mana can be expended for this spell--doesn't yet. 
                 TargetTile = Map.GetActorTile(PlayerActor),
                 IsCastable = false
@@ -198,13 +207,6 @@ namespace EphemRL.Models
             return result;
         }
 
-        private void ExpendManaForSpell(SpellCastDelta delta)
-        {
-            delta.ManaDelta.Do((tile, mana) => tile.Mana.Expend(mana));
-        }
-
-
-
         public List<MapTile> SelectableTiles { get; set; } 
         
         private RelayCommand _NextSpellStateCommand;
@@ -214,14 +216,13 @@ namespace EphemRL.Models
             {
                 return _NextSpellStateCommand ?? (_NextSpellStateCommand = new RelayCommand(hotkey =>
                 {
-                    var spell = Spells[Int32.Parse((string)hotkey)];
-                    var delta = SpellDeltas.SingleOrDefault(sd => sd.IsCastable && sd.Caster == PlayerActor && sd.Spell == spell);
+                    var delta = SpellDeltas.SingleOrDefault(sd => sd.Hotkey == (string)hotkey && sd.IsCastable);
 
                     if (delta == null) return;
 
                     if (Mode == InputMode.Normal)
                     {
-                        if (spell.Target == SpellTarget.Self)
+                        if (delta.Spell.Target == SpellTarget.Self)
                         {
                             ResolveSpell(delta);
                         }

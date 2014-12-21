@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -22,6 +23,7 @@ namespace EphemRL.Models
         public Dictionary<ManaElement, int> Mana { get; set; }
     }
 
+    [DebuggerDisplay("{Name} Proto")]
     public class SpellProto
     {
         public List<TileManaRequirement> TileManaRequired { get; set; }

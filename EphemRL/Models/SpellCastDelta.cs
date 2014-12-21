@@ -19,6 +19,8 @@ namespace EphemRL.Models
 
         public bool IsCastable { get; set; }
 
+        public string Hotkey { get; set; }
+
         public SpellCastDelta()
         {
             ManaDelta = new Dictionary<MapTile, Dictionary<ManaElement, int>>();
@@ -42,5 +44,6 @@ namespace EphemRL.Models
                 manaDict.Add(element, manaCount);
             }
         }
+
     }
 }

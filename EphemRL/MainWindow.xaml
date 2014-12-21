@@ -21,8 +21,12 @@
         <KeyBinding Command="{Binding MovePlayerCommand}" CommandParameter="MoveSouth" Key="s" />
         <KeyBinding Command="{Binding MovePlayerCommand}" CommandParameter="MoveWest" Key="a" />
         <KeyBinding Command="{Binding MovePlayerCommand}" CommandParameter="MoveEast" Key="d" />
-        <KeyBinding Command="{Binding NextSpellStateCommand}" CommandParameter="0" Key="D1" />
-        <KeyBinding Command="{Binding NextSpellStateCommand}" CommandParameter="1" Key="D2" />
+        <KeyBinding Command="{Binding NextSpellStateCommand}" CommandParameter="1" Key="D1" />
+        <KeyBinding Command="{Binding NextSpellStateCommand}" CommandParameter="2" Key="D2" />
+        <KeyBinding Command="{Binding NextSpellStateCommand}" CommandParameter="3" Key="D3" />
+        <KeyBinding Command="{Binding NextSpellStateCommand}" CommandParameter="4" Key="D4" />
+        <KeyBinding Command="{Binding NextSpellStateCommand}" CommandParameter="Q" Key="Q" />
+        <KeyBinding Command="{Binding NextSpellStateCommand}" CommandParameter="E" Key="E" />
     </Window.InputBindings>
     <StackPanel Orientation="Horizontal">
         <!--Status Panel on the left.-->
@@ -37,19 +41,22 @@
                 <ItemsControl ItemsSource="{Binding SpellDeltas}">
                     <ItemsControl.ItemTemplate>
                         <DataTemplate DataType="m:SpellCastDelta">
-                            <TextBlock Text="{Binding Spell.Name}" >
-                                <TextBlock.Style>
-                                    <Style TargetType="TextBlock">
-                                        <Setter Property="Foreground" Value="DarkGray" />
-                                        <Style.Triggers>
-                                            <DataTrigger Binding="{Binding IsCastable}" Value="true">
-                                                <Setter Property="Foreground" Value="Green" />
-                                                <Setter Property="FontWeight" Value="Bold" />
-                                            </DataTrigger>
-                                        </Style.Triggers>
-                                    </Style>
-                                </TextBlock.Style>
-                            </TextBlock>
+                            <WrapPanel>
+                                <TextBlock>[<Run Text="{Binding Hotkey}" />]:</TextBlock>
+                                <TextBlock Text="{Binding Spell.Name}" >
+                                    <TextBlock.Style>
+                                        <Style TargetType="TextBlock">
+                                            <Setter Property="Foreground" Value="DarkGray" />
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding IsCastable}" Value="true">
+                                                    <Setter Property="Foreground" Value="Green" />
+                                                    <Setter Property="FontWeight" Value="Bold" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </TextBlock.Style>
+                                </TextBlock>
+                            </WrapPanel>
                         </DataTemplate>
                     </ItemsControl.ItemTemplate>
                 </ItemsControl>
