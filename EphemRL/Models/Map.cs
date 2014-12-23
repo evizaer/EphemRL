@@ -41,6 +41,26 @@ namespace EphemRL.Models
             ActorPlaces = new Dictionary<Actor, MapTile>();
         }
 
+        public IEnumerable<MapTile> WalkTilesInRangeOf(MapTile origin, int range)
+        {
+            var frontier = new Queue<MapTile>();
+            frontier.Enqueue(origin);
+            var visitedTiles = new HashSet<MapTile>();
+
+            while (frontier.Any())
+            {
+                var cur = frontier.Dequeue();
+                visitedTiles.Add(cur);
+
+                yield return cur;
+
+                GetAdjacentTiles(cur).Where(t => !visitedTiles.Contains(t) 
+                                              && range >= t.DistanceTo(origin))
+                                     .Do(frontier.Enqueue);
+            }
+            
+        }
+
         public void SpawnActor(Actor a)
         {
             var tile = Tiles.Where(t => t.Proto.IsPassable).Choose();

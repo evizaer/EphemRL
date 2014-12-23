@@ -281,21 +281,7 @@ namespace EphemRL.Models
 
         public void MarkSelectableTilesFor(SpellCastDelta delta)
         {
-            var origin = Map.GetActorTile(delta.Caster);
-
-            var frontier = new Queue<MapTile>();
-            frontier.Enqueue(origin);
-
-            while (frontier.Any())
-            {
-                var cur = frontier.Dequeue();
-
-                MarkAsSelectable(cur);
-
-                Map.GetAdjacentTiles(cur).Where(t => !SelectableTiles.Contains(t) 
-                                             && delta.Spell.Range >= t.DistanceTo(origin))
-                                         .Do(frontier.Enqueue);
-            }
+            Map.WalkTilesInRangeOf(Map.GetActorTile(delta.Caster), delta.Spell.Range).Do(MarkAsSelectable);
         }
 
         public void MarkAsSelectable(MapTile tile)
