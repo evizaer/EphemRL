@@ -91,6 +91,11 @@ namespace EphemRL.Models
                 {
                     SelectedTile.Actor.Health -= 3;
                 }
+
+                if (SelectedTile.Proto.Name != "Ash")
+                {
+                    Map.ChangeTerrainOf(SelectedTile, "Ash");
+                }
             }
 
             EndTurn();
@@ -123,17 +128,35 @@ namespace EphemRL.Models
                 Caster = caster,
                 Spell = spell,
                 Hotkey = hotkey,
-                // TODO: TargetTile represents valid places where mana can be expended for this spell--doesn't yet. 
-                TargetTile = Map.GetActorTile(PlayerActor),
-                IsCastable = false
+                // null means that we have to check all tiles in range for valid targets.
+                TargetTile = spell.Target == SpellTarget.Self ? Map.GetActorTile(caster) : null,
+                IsCastable = false,
+                Mana = new ManaDelta()
             };
+
+
+            // Build mana delta for mana requirements that are relative to the caster's position.
+            ManaDelta manaNearSelf = GetManaDelta(Map.GetActorTile(caster), spell.TileManaRequired.Where(tmr => tmr.RelativeTo == SpellTarget.Self), spell.ManaRequiredRelativeToCaster);
+
+            if (manaNearSelf != null)
+            {
+                result.IsCastable = true;
+                result.Mana = manaNearSelf;
+            }
+
+            return result;
+        }
+
+        private ManaDelta GetManaDelta(MapTile srcTile, IEnumerable<TileManaRequirement> tileRequirements, Dictionary<ManaElement, int> aggregateRequirements)
+        {
+            var result = new ManaDelta();
 
             // This dictionary stores our progress towards expending all mana required to cast the spell.
             // It will be modified in the below loop: as we expend mana, we decrease the values in this dict.
             Dictionary<ManaElement, int> elementToManaNeeded;
-            if (spell.AggregateManaRequired != null)
+            if (aggregateRequirements != null)
             {
-                elementToManaNeeded = spell.AggregateManaRequired.Where(e => e.Value > 0)
+                elementToManaNeeded = aggregateRequirements.Where(e => e.Value > 0)
                                                                  .ToDictionary(e => e.Key, e => e.Value);
             }
             else
@@ -143,9 +166,11 @@ namespace EphemRL.Models
             
             // All required mana must be expended from tiles listed in the TileManaRequirements, and all
             // possible mana to fulfill requirements is drawn from them in order of appearance in the config.
-            foreach (var requirement in spell.TileManaRequired)
+            foreach (var requirement in tileRequirements)
             {
-                int x = result.TargetTile.X + requirement.DX, y = result.TargetTile.Y + requirement.DY;
+                int x, y;
+                x = srcTile.X + requirement.DX;
+                y = srcTile.Y + requirement.DY;
 
                 if (x >= 0 && x < Map.Width && y >= 0 && y < Map.Height)
                 {
@@ -162,12 +187,12 @@ namespace EphemRL.Models
 
                             if (neededMana <= presentMana)
                             {
-                                result.AddToManaDelta(tile, element, neededMana);
+                                result.Add(tile, element, neededMana);
                             }
                             else
                             {
-                                // We didn't have required mana, so bail. Current state of result has IsCastable=false, so we're fine.
-                                return result;
+                                // We didn't have required mana, so bail. 
+                                return null;
                             }
                         }
                     }
@@ -181,7 +206,7 @@ namespace EphemRL.Models
 
                         int manaUsed = Math.Min(presentMana, neededMana);
 
-                        result.AddToManaDelta(tile, element, manaUsed);
+                        result.Add(tile, element, manaUsed);
 
                         int remainingManaNeeded = neededMana - manaUsed;
                         if (remainingManaNeeded <= 0)
@@ -199,9 +224,9 @@ namespace EphemRL.Models
             }
 
             // If there's any mana needed after expending mana wherever possible, this spell cannot be cast.
-            if (!elementToManaNeeded.Any())
+            if (elementToManaNeeded.Any())
             {
-                result.IsCastable = true;
+                return null;
             }
 
             return result;

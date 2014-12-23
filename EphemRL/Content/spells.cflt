@@ -2,12 +2,18 @@
 	{
 		Name: Create Water,
 		TileManaRequired: [{DX: 1, DY: 0}, {DX: 0, DY: 1}, {DX: -1, DY: 0}, {DX: 0, DY: -1}],
-		AggregateManaRequired: {Water: 3},
+		ManaRequiredRelativeToCaster: {Water: 3},
 		Target: Self
 	},
 	{
 		Name: Firebolt,
 		TileManaRequired: [{DX: 1, DY: 0, Mana: {Fire: 1}}],
+		Range: 4,
+		Target: Terrain
+	},
+	{
+		Name: Blink,
+		TileManaRequired: [{RelativeTo: Terrain, DX: 0, DY: 0, Mana: {Void: 1}}],
 		Range: 4,
 		Target: Terrain
 	}

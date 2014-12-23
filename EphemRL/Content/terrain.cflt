@@ -26,5 +26,12 @@
 		SpriteKey: "Water",
 		ManaCapacity: {Water: 2, Life: 1}
 		BlocksSight: false
+	},
+	{
+		Name: "Ash",
+		IsPassable: true,
+		SpriteKey: "Ash",
+		ManaCapacity: {Void: 2, Earth: 1},
+		BlocksSight: false
 	}
 ]

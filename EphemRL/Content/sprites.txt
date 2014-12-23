@@ -1,4 +1,5 @@
 ﻿960|Grass
+861|Ash
 1152|Wall
 1181|Lava
 1245|Water

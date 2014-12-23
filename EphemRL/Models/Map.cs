@@ -171,7 +171,7 @@ namespace EphemRL.Models
 
         public void ExpendManaForSpell(SpellCastDelta delta)
         {
-            delta.ManaDelta.Do((tile, mana) => tile.Mana.Expend(mana));
+            delta.Mana.Delta.Do((tile, mana) => tile.Mana.Expend(mana));
         }
     }
 }

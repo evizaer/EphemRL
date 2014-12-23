@@ -18,7 +18,7 @@ namespace EphemRL.Models
         public int DX { get; set; }
         public int DY { get; set; }
 
-        public SpellTarget Target { get; set; }
+        public SpellTarget RelativeTo { get; set; }
 
         public Dictionary<ManaElement, int> Mana { get; set; }
     }
@@ -27,14 +27,16 @@ namespace EphemRL.Models
     public class SpellProto
     {
         public List<TileManaRequirement> TileManaRequired { get; set; }
-        public Dictionary<ManaElement, int> AggregateManaRequired { get; set; }
+        public Dictionary<ManaElement, int> ManaRequiredRelativeToCaster { get; set; }
+        public Dictionary<ManaElement, int> ManaRequiredRelativeToTarget { get; set; }
         public string Name { get; set; }
         public int Range { get; set; }
         public SpellTarget Target { get; set; }
 
         public SpellProto()
         {
-            AggregateManaRequired = new Dictionary<ManaElement, int>();
+            ManaRequiredRelativeToCaster = new Dictionary<ManaElement, int>();
+            ManaRequiredRelativeToTarget = new Dictionary<ManaElement, int>();
         }
     }
 }

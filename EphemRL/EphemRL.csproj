@@ -63,6 +63,7 @@
     <Compile Include="Helpers\LineOfSight.cs" />
     <Compile Include="Models\ActorProto.cs" />
     <Compile Include="Models\ManaClock.cs" />
+    <Compile Include="Models\ManaDelta.cs" />
     <Compile Include="Models\ManaSource.cs" />
     <Compile Include="Models\Map.cs" />
     <Compile Include="Models\SpellCastDelta.cs" />
