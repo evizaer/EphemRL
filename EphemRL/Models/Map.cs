@@ -169,7 +169,7 @@ namespace EphemRL.Models
         public void SetTileVisibilityForLineOfSight(Actor a)
         {
             Tiles.Do(t => t.IsHidden = true);
-            LineOfSight.Calculate(Tiles, GetActorTile(a), (_, src) => GetAdjacentTiles(src)).Do(t => t.IsHidden = false);
+            LineOfSight.Calculate(this, GetActorTile(a)).Do(t => t.IsHidden = false);
         }
 
         public static List<Tuple<int, int>> AdjacencyDeltas =  new List<Tuple<int, int>>

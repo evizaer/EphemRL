@@ -10,7 +10,7 @@ namespace EphemRL.Helpers
 {
     public static class LineOfSight
     {
-        public static IEnumerable<MapTile> Calculate(IList<MapTile> map, MapTile sourceTile, Func<IList<MapTile>, MapTile, IEnumerable<MapTile>> getAdjacentTiles) 
+        public static IEnumerable<MapTile> Calculate(Map map, MapTile sourceTile) 
         {
             var tilesProcessed = new HashSet<MapTile>();
 
@@ -23,7 +23,7 @@ namespace EphemRL.Helpers
             visibleTiles.Add(sourceTile);
             yield return sourceTile;
 
-            frontier.EnqueueAll(getAdjacentTiles(map, sourceTile));
+            frontier.EnqueueAll(map.GetAdjacentTiles(sourceTile));
 
             while (!frontier.IsEmpty)
             {
@@ -44,7 +44,7 @@ namespace EphemRL.Helpers
                 //    adjacent tiles.
                 MapTile tileNearestToSource = null;
                 var minDistanceToSource = double.MaxValue;
-                foreach (var tile in getAdjacentTiles(map, cur))
+                foreach (var tile in map.GetAdjacentTiles(cur))
                 {
                     var distanceToSource = tile.DistanceTo(sourceTile);
 
