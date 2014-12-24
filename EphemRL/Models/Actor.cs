@@ -33,6 +33,8 @@ namespace EphemRL.Models
 
         public List<SpellProto> Spells { get; set; }
 
+        public IEnumerable<MapTile> VisibleTiles { get; set; }
+
         public Actor(ActorProto proto, IEnumerable<SpellProto> allSpells)
         {
             Proto = proto;
@@ -43,5 +45,6 @@ namespace EphemRL.Models
 
             Spells = allSpells.Where(s => proto.Spells.Contains(s.Name)).ToList();
         }
+
     }
 }

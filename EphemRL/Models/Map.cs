@@ -29,6 +29,8 @@ namespace EphemRL.Models
 
         private Dictionary<Actor, MapTile> ActorPlaces { get; set; }
 
+        public IEnumerable<Actor> Actors { get { return ActorPlaces.Keys; } }
+
         public Map(List<TerrainProto> terrainTypes) 
         {
             TerrainTypes = terrainTypes;
@@ -169,7 +171,7 @@ namespace EphemRL.Models
         public void SetTileVisibilityForLineOfSight(Actor a)
         {
             Tiles.Do(t => t.IsHidden = true);
-            LineOfSight.Calculate(this, GetActorTile(a)).Do(t => t.IsHidden = false);
+            a.VisibleTiles.Do(t => t.IsHidden = false);
         }
 
         public static List<Tuple<int, int>> AdjacencyDeltas =  new List<Tuple<int, int>>

@@ -119,6 +119,8 @@ namespace EphemRL.Models
             UnselectAllTiles();
             Mode = InputMode.Normal;
 
+            Map.Actors.AsParallel().Do(a => a.VisibleTiles = LineOfSight.Calculate(Map, Map.GetActorTile(a)));
+
             Map.SetTileVisibilityForLineOfSight(PlayerActor);
 
             Map.RegenerateMana(Clock.Tick());
