@@ -68,6 +68,7 @@
     <Compile Include="Models\Map.cs" />
     <Compile Include="Models\SpellCastDelta.cs" />
     <Compile Include="Models\SpellProto.cs" />
+    <Compile Include="Models\SpellTargetCriteria.cs" />
     <Compile Include="Models\TerrainProto.cs" />
     <Compile Include="Spritesheet.cs" />
     <Page Include="MainWindow.xaml">

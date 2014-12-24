@@ -31,7 +31,7 @@ namespace EphemRL.Models
         public Dictionary<ManaElement, int> ManaRequiredRelativeToTarget { get; set; }
         public string Name { get; set; }
         public int Range { get; set; }
-        public SpellTarget Target { get; set; }
+        public SpellTargetCriteria TargetCriteria { get; set; }
 
         public SpellProto()
         {

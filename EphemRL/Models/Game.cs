@@ -143,7 +143,7 @@ namespace EphemRL.Models
 
             if (manaNearSelf == null) return delta;
 
-            if (spell.Target == SpellTarget.Self)
+            if (spell.TargetCriteria.Target == SpellTarget.Self)
             {
                 delta.IsCastable = true;
                 delta.ValidTargets = new Dictionary<MapTile,ManaDelta> { {Map.GetActorTile(caster), manaNearSelf} };
@@ -151,7 +151,9 @@ namespace EphemRL.Models
             else
             {
                 //TODO: Filter based on if in line of sight or passable, if the spell requires those things.
-                var validTargets = Map.WalkTilesInRangeOf(Map.GetActorTile(caster), spell.Range).Select(t => new
+                var validTargets = Map.WalkTilesInRangeOf(Map.GetActorTile(caster), spell.Range)
+                                      .Where(t => spell.TargetCriteria.AreSatisfiedBy(t, caster))
+                                      .Select(t => new
                 {
                     Tile = t,
                     Delta = manaNearSelf.Merge(GetManaDelta(t, spell.TileManaRequired.Where(tmr => tmr.RelativeTo == SpellTarget.Terrain), spell.ManaRequiredRelativeToTarget))
@@ -264,7 +266,7 @@ namespace EphemRL.Models
 
                     if (Mode == InputMode.Normal)
                     {
-                        if (delta.Spell.Target == SpellTarget.Self)
+                        if (delta.Spell.TargetCriteria.Target == SpellTarget.Self)
                         {
                             ResolveSpell(delta);
                         }
