@@ -91,9 +91,9 @@
                 </ItemsControl.ItemsPanel>
                 <ItemsControl.ItemTemplate>
                     <DataTemplate DataType="m:MapTile">
-                        <Canvas>
+                        <Canvas ToolTip="{Binding ToolTip}">
                             <Border BorderThickness="1" Margin="-1" BorderBrush="Black">
-                                <Image Source="{Binding Sprite}" ToolTip="{Binding ToolTip}" />
+                                <Image Source="{Binding Sprite}"  />
                             </Border>
                             <Canvas Visibility="{Binding ShouldShowContents, Converter={StaticResource BoolToVisibility}}">
                                 <Image Source="{Binding Actor.Sprite}" />
