@@ -50,6 +50,9 @@ namespace EphemRL.Models
             while (frontier.Any())
             {
                 var cur = frontier.Dequeue();
+
+                if (visitedTiles.Contains(cur)) continue;
+
                 visitedTiles.Add(cur);
 
                 yield return cur;
@@ -82,6 +85,11 @@ namespace EphemRL.Models
             var y = t.Y + dy;
 
             MoveActorTo(actor, x, y);
+        }
+
+        public void MoveActorTo(Actor actor, MapTile t)
+        {
+            MoveActorTo(actor, t.X, t.Y);
         }
 
         public void MoveActorTo(Actor actor, int x, int y)
@@ -189,9 +197,9 @@ namespace EphemRL.Models
             Tiles.Do(t => t.Mana.Regenerate(e));
         }
 
-        public void ExpendManaForSpell(SpellCastDelta delta)
+        public void ExpendManaForSpell(SpellCastDelta delta, MapTile targetTile)
         {
-            delta.Mana.Delta.Do((tile, mana) => tile.Mana.Expend(mana));
+            delta.ValidTargets[targetTile].Delta.Do((tile, mana) => tile.Mana.Expend(mana));
         }
     }
 }

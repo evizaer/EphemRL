@@ -14,13 +14,11 @@ namespace EphemRL.Models
 
         public SpellProto Spell { get; set; }
 
-        public MapTile TargetTile { get; set; }
+        public Dictionary<MapTile, ManaDelta> ValidTargets { get; set; }
 
         public bool IsCastable { get; set; }
 
         public string Hotkey { get; set; }
-
-        public ManaDelta Mana { get; set; }
 
         public SpellCastDelta()
         {

@@ -48,6 +48,8 @@ namespace EphemRL.Models
 
         public ManaDelta Merge(ManaDelta other)
         {
+            if (other == null) return null;
+
             var result = new ManaDelta();
 
             foreach (var tileGroup in Delta.Concat(other.Delta).GroupBy(kv => kv.Key))

@@ -53,7 +53,6 @@ namespace EphemRL.Models
 
             SpellDeltas = new ObservableCollection<SpellCastDelta>();
 
-
             var terrainTypes = ObjectLoader.LoadInstanceList<TerrainProto>(File.ReadAllText("Content\\terrain.cflt"));
             Map = new Map(terrainTypes);
 
@@ -78,7 +77,7 @@ namespace EphemRL.Models
         
         public void ResolveSpell(SpellCastDelta delta)
         {
-            Map.ExpendManaForSpell(delta);
+            Map.ExpendManaForSpell(delta, delta.ValidTargets.Count == 1 ? delta.ValidTargets.First().Key : SelectedTile);
 
             //TODO: Further refactor this into some kind of static spell resolution class, provide calling details in spells.cflt.
             if (delta.Spell.Name == "Create Water")
@@ -97,7 +96,13 @@ namespace EphemRL.Models
                     Map.ChangeTerrainOf(SelectedTile, "Ash");
                 }
             }
-
+            else if (delta.Spell.Name == "Blink")
+            {
+                if (SelectedTile.Proto.IsPassable && SelectedTile.Actor == null)
+                {
+                    Map.MoveActorTo(delta.Caster, SelectedTile);                    
+                }
+            }
             EndTurn();
         }
 
@@ -123,28 +128,38 @@ namespace EphemRL.Models
 
         private SpellCastDelta BuildSpellDelta(SpellProto spell, Actor caster, string hotkey)
         {
-            var result = new SpellCastDelta
+            // Build mana delta for mana requirements that are relative to the caster's position.
+            ManaDelta manaNearSelf = GetManaDelta(Map.GetActorTile(caster), spell.TileManaRequired.Where(tmr => tmr.RelativeTo == SpellTarget.Self), spell.ManaRequiredRelativeToCaster);
+
+            var delta = new SpellCastDelta
             {
                 Caster = caster,
                 Spell = spell,
                 Hotkey = hotkey,
-                // null means that we have to check all tiles in range for valid targets.
-                TargetTile = spell.Target == SpellTarget.Self ? Map.GetActorTile(caster) : null,
-                IsCastable = false,
-                Mana = new ManaDelta()
+                IsCastable = false
             };
 
+            if (manaNearSelf == null) return delta;
 
-            // Build mana delta for mana requirements that are relative to the caster's position.
-            ManaDelta manaNearSelf = GetManaDelta(Map.GetActorTile(caster), spell.TileManaRequired.Where(tmr => tmr.RelativeTo == SpellTarget.Self), spell.ManaRequiredRelativeToCaster);
-
-            if (manaNearSelf != null)
+            if (spell.Target == SpellTarget.Self)
             {
-                result.IsCastable = true;
-                result.Mana = manaNearSelf;
+                delta.IsCastable = true;
+                delta.ValidTargets = new Dictionary<MapTile,ManaDelta> { {Map.GetActorTile(caster), manaNearSelf} };
+            }
+            else
+            {
+                //TODO: Filter based on if in line of sight or passable, if the spell requires those things.
+                var validTargets = Map.WalkTilesInRangeOf(Map.GetActorTile(caster), spell.Range).Select(t => new
+                {
+                    Tile = t,
+                    Delta = manaNearSelf.Merge(GetManaDelta(t, spell.TileManaRequired.Where(tmr => tmr.RelativeTo == SpellTarget.Terrain), spell.ManaRequiredRelativeToTarget))
+                }).Where(td => td.Delta != null).ToDictionary(td => td.Tile, td => td.Delta);
+
+                delta.IsCastable = validTargets.Any();
+                delta.ValidTargets = validTargets;
             }
 
-            return result;
+            return delta;
         }
 
         private ManaDelta GetManaDelta(MapTile srcTile, IEnumerable<TileManaRequirement> tileRequirements, Dictionary<ManaElement, int> aggregateRequirements)
@@ -262,7 +277,6 @@ namespace EphemRL.Models
                         // If no tile is selected, cancel selection mode.
                         if (SelectedTile != null)
                         {
-                            delta.TargetTile = SelectedTile;
                             ResolveSpell(delta);
 
                             UnselectAllTiles();
@@ -281,7 +295,7 @@ namespace EphemRL.Models
 
         public void MarkSelectableTilesFor(SpellCastDelta delta)
         {
-            Map.WalkTilesInRangeOf(Map.GetActorTile(delta.Caster), delta.Spell.Range).Do(MarkAsSelectable);
+            delta.ValidTargets.Keys.Do(MarkAsSelectable);
         }
 
         public void MarkAsSelectable(MapTile tile)
