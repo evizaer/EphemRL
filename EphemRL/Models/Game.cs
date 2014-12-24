@@ -119,11 +119,11 @@ namespace EphemRL.Models
             UnselectAllTiles();
             Mode = InputMode.Normal;
 
-            PopulateSpellDeltas();
-
             Map.SetTileVisibilityForLineOfSight(PlayerActor);
 
             Map.RegenerateMana(Clock.Tick());
+
+            PopulateSpellDeltas();
         }
 
         private SpellCastDelta BuildSpellDelta(SpellProto spell, Actor caster, string hotkey)
