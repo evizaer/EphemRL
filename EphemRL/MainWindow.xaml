@@ -17,10 +17,12 @@
         <Binding Source="{StaticResource Game}" />
     </Window.DataContext>
     <Window.InputBindings>
-        <KeyBinding Command="{Binding MovePlayerCommand}" CommandParameter="MoveNorth" Key="w" />
-        <KeyBinding Command="{Binding MovePlayerCommand}" CommandParameter="MoveSouth" Key="s" />
-        <KeyBinding Command="{Binding MovePlayerCommand}" CommandParameter="MoveWest" Key="a" />
-        <KeyBinding Command="{Binding MovePlayerCommand}" CommandParameter="MoveEast" Key="d" />
+        <KeyBinding Command="{Binding HotkeyCommand}" CommandParameter="MoveNorth" Key="w" />
+        <KeyBinding Command="{Binding HotkeyCommand}" CommandParameter="MoveSouth" Key="s" />
+        <KeyBinding Command="{Binding HotkeyCommand}" CommandParameter="MoveWest" Key="a" />
+        <KeyBinding Command="{Binding HotkeyCommand}" CommandParameter="MoveEast" Key="d" />
+        <KeyBinding Command="{Binding HotkeyCommand}" CommandParameter="CancelCast" Key="Escape" />
+        <KeyBinding Command="{Binding HotkeyCommand}" CommandParameter="EndTurn" Key="Space" />
         <KeyBinding Command="{Binding NextSpellStateCommand}" CommandParameter="1" Key="D1" />
         <KeyBinding Command="{Binding NextSpellStateCommand}" CommandParameter="2" Key="D2" />
         <KeyBinding Command="{Binding NextSpellStateCommand}" CommandParameter="3" Key="D3" />

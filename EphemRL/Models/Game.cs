@@ -68,6 +68,8 @@ namespace EphemRL.Models
                 {"MoveWest", () => { Map.MoveActorBy(PlayerActor, -1, 0); EndTurn(); }},
                 {"MoveEast", () => { Map.MoveActorBy(PlayerActor, 1, 0); EndTurn(); }},
                 {"MoveSouth", () => { Map.MoveActorBy(PlayerActor, 0, 1); EndTurn(); }},
+                {"EndTurn", () => { EndTurn(); }},
+                {"CancelCast", () => { UnselectAllTiles(); Mode = InputMode.Normal; }}
             };
 
             SelectableTiles = new List<MapTile>();
@@ -315,10 +317,10 @@ namespace EphemRL.Models
             SelectableTiles.Clear();
         }
 
-        private RelayCommand _MovePlayerCommand;
-        public RelayCommand MovePlayerCommand
+        private RelayCommand _HotkeyCommand;
+        public RelayCommand HotkeyCommand
         {
-            get { return _MovePlayerCommand ?? (_MovePlayerCommand = new RelayCommand(o => InputActions[(string)o]())); }
+            get { return _HotkeyCommand ?? (_HotkeyCommand = new RelayCommand(o => InputActions[(string)o]())); }
         }
 
         private RelayCommand _SelectTileCommand;
