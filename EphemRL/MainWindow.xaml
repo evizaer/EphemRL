@@ -3,7 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:m="clr-namespace:EphemRL.Models"
         xmlns:c="clr-namespace:EphemRL.Converters"
-        Title="MainWindow" Height="350" Width="525"
+        Title="EphemRL" Height="350" Width="525"
         SizeToContent="WidthAndHeight">
     <Window.Resources>
         <m:Game x:Key="Game" />
@@ -120,6 +120,10 @@
                                     </ItemsControl.ItemTemplate>
                                 </ItemsControl>
                             </Border>
+
+                            <Viewbox Stretch="Uniform" Width="10" Height="10" Canvas.Top="4" Canvas.Left="1" Visibility="{Binding IsBurning, Converter={StaticResource BoolToVisibility}}">
+                                <TextBlock Text="{Binding BurnTurnsRemaining}" TextAlignment="Left" FontSize="10" FontStretch="Normal"  FontStyle="Normal" Foreground="Pink" Width="10" />
+                            </Viewbox>
 
                             <Rectangle Canvas.Top="0" Canvas.Left="0" Width="32" Height="32" Fill="Black" Opacity="0.7" 
                                    Visibility="{Binding IsHidden, Converter={StaticResource BoolToVisibility}}" />

@@ -26,6 +26,22 @@ namespace EphemRL.Models
 
         public ManaSource Mana { get; set; }
 
+        private double _FireFuel;
+        public double FireFuel
+        {
+            get { return _FireFuel; }
+            set { if (value != _FireFuel) { _FireFuel = value; NotifyPropertyChanged(); NotifyPropertyChanged("BurnTurnsRemaining"); } }
+        }
+
+        public int BurnTurnsRemaining { get { return (int)(FireFuel / Proto.BurnRate); } }
+
+        private bool _IsBurning;
+        public bool IsBurning
+        {
+            get { return _IsBurning; }
+            set { if (value != _IsBurning) { _IsBurning = value; NotifyPropertyChanged("IsBurning"); } }
+        }
+
         private bool _IsSelectable;
         public bool IsSelectable
         {
@@ -79,6 +95,7 @@ namespace EphemRL.Models
             Sprite = Spritesheet.Get(terrain.SpriteKey);
             IsSelectable = false;
             IsHidden = true;
+            FireFuel = 1.0;
 
             Mana = new ManaSource(Proto.ManaCapacity);
         }

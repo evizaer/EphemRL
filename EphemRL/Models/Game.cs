@@ -93,9 +93,10 @@ namespace EphemRL.Models
                     SelectedTile.Actor.Health -= 3;
                 }
 
-                if (SelectedTile.Proto.Name != "Ash")
+                // TODO: Implement "kindle strength" so not all spells light everything on fire uniformly.
+                if (SelectedTile.Proto.FireResistance < 1)
                 {
-                    Map.ChangeTerrainOf(SelectedTile, "Ash");
+                    SelectedTile.IsBurning = true;
                 }
             }
             else if (delta.Spell.Name == "Blink")
@@ -105,6 +106,7 @@ namespace EphemRL.Models
                     Map.MoveActorTo(delta.Caster, SelectedTile);                    
                 }
             }
+
             EndTurn();
         }
 
@@ -120,6 +122,8 @@ namespace EphemRL.Models
         {
             UnselectAllTiles();
             Mode = InputMode.Normal;
+
+            FireSimulator.Tick(Map);
 
             Map.Actors.AsParallel().Do(a => a.VisibleTiles = LineOfSight.Calculate(Map, Map.GetActorTile(a)));
 

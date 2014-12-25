@@ -5,6 +5,8 @@
 		SpriteKey: "Wall",
 		ManaCapacity: {Void: 1} 
 		BlocksSight: true
+		FireResistance: .2
+		BurnRate: .05
 	},
 	{
 		Name: "Grass",
@@ -12,6 +14,17 @@
 		SpriteKey: "Grass",
 		ManaCapacity: {Earth: 2, Life: 1} 
 		BlocksSight: false
+		FireResistance: .05
+		BurnRate: .2
+	},
+	{
+		Name: "Dirt",
+		IsPassable: true,
+		SpriteKey: "Dirt",
+		ManaCapacity: {Earth: 1} 
+		BlocksSight: false
+		FireResistance: .1
+		BurnRate: .1
 	},
 	{
 		Name: "Lava",

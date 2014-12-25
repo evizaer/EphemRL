@@ -60,6 +60,7 @@
     <Compile Include="Converters\HideIfNullConverter.cs" />
     <Compile Include="Converters\PercentageToWidthConverter.cs" />
     <Compile Include="Converters\ShouldTileDisplayActorConverter.cs" />
+    <Compile Include="Helpers\FireSimulator.cs" />
     <Compile Include="Helpers\LineOfSight.cs" />
     <Compile Include="Models\ActorProto.cs" />
     <Compile Include="Models\ManaClock.cs" />

@@ -7,7 +7,6 @@ using System.Threading.Tasks;
 
 namespace EphemRL.Models
 {
-    [DataContract]
     public class TerrainProto
     {
         public Dictionary<ManaElement, int> ManaCapacity { get; set; } 
@@ -15,5 +14,7 @@ namespace EphemRL.Models
         public string SpriteKey { get; set; }
         public bool IsPassable { get; set; }
         public bool BlocksSight { get; set; }
+        public double FireResistance { get; set; }
+        public double BurnRate { get; set; }
     }
 }
