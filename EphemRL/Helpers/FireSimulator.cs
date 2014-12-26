@@ -21,6 +21,11 @@ namespace EphemRL.Helpers
                     burningTile.IsBurning = false;
                     m.ChangeTerrainOf(burningTile, "Ash");
                 }
+
+                if (burningTile.Actor != null)
+                {
+                    burningTile.Actor.Health -= 1;
+                }
             }
         }
     }

@@ -11,6 +11,7 @@
         <c:PercentageToWidthConverter x:Key="PercentageToWidth" />
         <c:ElementToColorConverter x:Key="ElementToColor" />
         <c:ShouldTileDisplayActorConverter x:Key="ShouldTileDisplayActor" />
+        <c:ExistsToBoolConverter x:Key="ExistsToBool"/>
         <BooleanToVisibilityConverter x:Key="BoolToVisibility" />
     </Window.Resources>
     <Window.DataContext>
@@ -93,7 +94,29 @@
                 </ItemsControl.ItemsPanel>
                 <ItemsControl.ItemTemplate>
                     <DataTemplate DataType="m:MapTile">
-                        <Canvas ToolTip="{Binding ToolTip}">
+                        <Canvas>
+                            <Canvas.ToolTip>
+                                <StackPanel>
+                                    <TextBlock Text="{Binding ToolTip}"/>
+                                    <TextBlock>
+                                        <TextBlock.Style>
+                                            <Style>
+                                                <Setter Property="Control.Visibility" Value="Hidden" />
+                                                <Style.Triggers>
+                                                    <MultiDataTrigger>
+                                                        <MultiDataTrigger.Conditions>
+                                                            <Condition Binding="{Binding Path=IsHidden}" Value="false" />
+                                                            <Condition Binding="{Binding Path=Actor, Converter={StaticResource ExistsToBool}}" Value="true" />
+                                                        </MultiDataTrigger.Conditions>
+                                                        <Setter Property="Control.Visibility" Value="Visible" />
+                                                    </MultiDataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </TextBlock.Style>
+                                        <Run Text="{Binding Actor.Proto.Name}"/> (<Run Text="{Binding Actor.Health}" />/<Run Text="{Binding Actor.MaxHealth}"/>)
+                                    </TextBlock>
+                                </StackPanel>
+                            </Canvas.ToolTip>
                             <Border BorderThickness="1" Margin="-1" BorderBrush="Black">
                                 <Image Source="{Binding Sprite}"  />
                             </Border>
