@@ -16,5 +16,10 @@ namespace EphemRL.Models
         public bool BlocksSight { get; set; }
         public double FireResistance { get; set; }
         public double BurnRate { get; set; }
+
+        public TerrainProto()
+        {
+            FireResistance = 1;
+        }
     }
 }
