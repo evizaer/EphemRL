@@ -33,7 +33,7 @@ namespace EphemRL.Models
             set { if (value != _FireFuel) { _FireFuel = value; NotifyPropertyChanged(); NotifyPropertyChanged("BurnTurnsRemaining"); } }
         }
 
-        public int BurnTurnsRemaining { get { return (int)(FireFuel / Proto.BurnRate); } }
+        public int BurnTurnsRemaining { get { return (int)Math.Ceiling(FireFuel / Proto.BurnRate); } }
 
         private bool _IsBurning;
         public bool IsBurning
