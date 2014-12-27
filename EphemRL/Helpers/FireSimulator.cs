@@ -26,6 +26,14 @@ namespace EphemRL.Helpers
                 {
                     burningTile.Actor.Health -= 1;
                 }
+
+                if (burningTile.FireFuel < .5)
+                {
+                    var ignitedTile = m.GetAdjacentTiles(burningTile).Where(t => t.Proto.FireResistance < 1 && !t.IsBurning)
+                                                                     .OrderBy(t => t.Proto.FireResistance).FirstOrDefault();
+
+                    if (ignitedTile != null) ignitedTile.IsBurning = true;
+                }
             }
         }
     }
