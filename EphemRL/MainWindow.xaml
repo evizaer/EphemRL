@@ -101,7 +101,7 @@
                                     <TextBlock>
                                         <TextBlock.Style>
                                             <Style>
-                                                <Setter Property="Control.Visibility" Value="Hidden" />
+                                                <Setter Property="Control.Visibility" Value="Collapsed" />
                                                 <Style.Triggers>
                                                     <MultiDataTrigger>
                                                         <MultiDataTrigger.Conditions>
