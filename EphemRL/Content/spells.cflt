@@ -22,5 +22,11 @@
 			Target: Terrain,
 			TerrainCriteria: {IsPassable: true, IsVisible: true, HasActor: false}
 		}
+	},
+	{
+		Name: Douse,
+		TileManaRequired: [{DX: 1, DY: 0}, {DX: 0, DY: 1}, {DX: -1, DY: 0}, {DX: 0, DY: -1}],
+		ManaRequiredRelativeToCaster: {Water: 2}
+		TargetCriteria: {Target: Self}
 	}
 ]

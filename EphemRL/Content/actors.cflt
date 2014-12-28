@@ -2,7 +2,7 @@
 	{
 		Name: "You",
 		MaxHealth: 10,
-		Spells: ["Create Water", "Firebolt", "Blink"]
+		Spells: ["Create Water", "Firebolt", "Blink", "Douse"]
 		SpriteKey: "Player"
 		SightRange: 8
 	},

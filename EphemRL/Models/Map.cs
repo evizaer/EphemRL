@@ -181,6 +181,11 @@ namespace EphemRL.Models
             Tuple.Create(-1, 1), Tuple.Create(1, -1)
         };
 
+        public IEnumerable<MapTile> GetAdjacentTiles(Actor a)
+        {
+            return GetAdjacentTiles(GetActorTile(a));
+        }
+
         public IEnumerable<MapTile> GetAdjacentTiles(MapTile t)
         {
             foreach (var delta in AdjacencyDeltas)

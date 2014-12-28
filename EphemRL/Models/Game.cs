@@ -106,6 +106,11 @@ namespace EphemRL.Models
                     Map.MoveActorTo(delta.Caster, SelectedTile);                    
                 }
             }
+            else if (delta.Spell.Name == "Douse")
+            {
+                Map.GetActorTile(delta.Caster).IsBurning = false;
+                Map.GetAdjacentTiles(delta.Caster).Do(t => t.IsBurning = false);
+            }
 
             EndTurn();
         }
