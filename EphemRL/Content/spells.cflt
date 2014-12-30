@@ -16,7 +16,7 @@
 	},
 	{
 		Name: Blink,
-		TileManaRequired: [{RelativeTo: Terrain, DX: 0, DY: 0, Mana: {Void: 1}}],
+		TileManaRequired: [{RelativeTo: Terrain, DX: 0, DY: 0, Mana: {Void: 1}}, {RelativeTo: Self, Mana: {Void: 1}}],
 		Range: 4,
 		TargetCriteria: {
 			Target: Terrain,
@@ -28,5 +28,15 @@
 		TileManaRequired: [{DX: 1, DY: 0}, {DX: 0, DY: 1}, {DX: -1, DY: 0}, {DX: 0, DY: -1}],
 		ManaRequiredRelativeToCaster: {Water: 2}
 		TargetCriteria: {Target: Self}
+	},
+	{
+		Name: Dirt Blast,
+		TileManaRequired: [{DX: 1, DY: 0}, {DX: -1, DY: 0}],
+		ManaRequiredRelativeToCaster: {Earth: 2},
+		TargetCriteria: {
+			Target: Terrain,
+			TerrainCriteria: {IsVisible: true}
+		},
+		Range: 3
 	}
 ]

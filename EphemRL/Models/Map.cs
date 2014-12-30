@@ -66,6 +66,26 @@ namespace EphemRL.Models
             
         }
 
+        public IEnumerable<MapTile> WalkLineToTile(MapTile origin, MapTile destination)
+        {
+            MapTile cur = origin;
+
+            var xSign = origin.X - destination.X < 0 ? 1 : -1;
+            var ySign = origin.Y - destination.Y < 0 ? 1 : -1;
+
+            while (cur != destination)
+            {
+                var dx = Math.Abs(cur.X - destination.X);
+                var dy = Math.Abs(cur.Y - destination.Y);
+
+                if (dx > dy) cur = GetTileAt(cur.X + xSign, cur.Y);
+                else if (dx < dy) cur = GetTileAt(cur.X, cur.Y + ySign);
+                else cur = GetTileAt(cur.X + xSign, cur.Y + ySign);
+
+                yield return cur;
+            }
+        }
+
         public void SpawnActor(Actor a)
         {
             var tile = Tiles.Where(t => t.Proto.IsPassable).Choose();

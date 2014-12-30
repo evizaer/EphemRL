@@ -111,6 +111,11 @@ namespace EphemRL.Models
                 Map.GetActorTile(delta.Caster).IsBurning = false;
                 Map.GetAdjacentTiles(delta.Caster).Do(t => t.IsBurning = false);
             }
+            else if (delta.Spell.Name == "Dirt Blast")
+            {
+                // TODO: Do damage to actors in the way, maybe? Pushback?
+                Map.WalkLineToTile(Map.GetActorTile(delta.Caster), SelectedTile).Do(t => Map.ChangeTerrainOf(t, "Dirt"));
+            }
 
             EndTurn();
         }
