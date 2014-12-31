@@ -113,8 +113,11 @@ namespace EphemRL.Models
             }
             else if (delta.Spell.Name == "Dirt Blast")
             {
-                // TODO: Do damage to actors in the way, maybe? Pushback?
-                Map.WalkLineToTile(Map.GetActorTile(delta.Caster), SelectedTile).Do(t => Map.ChangeTerrainOf(t, "Dirt"));
+                var tiles = Map.WalkLineToTile(Map.GetActorTile(delta.Caster), SelectedTile).ToList();
+                var pushedActors = tiles.Where(t => t.Actor != null).Select(t => t.Actor).Reverse().ToList();
+                tiles.Do(t => { Map.ChangeTerrainOf(t, "Dirt"); t.Actor = null; });
+                tiles.Reverse<MapTile>().Zip(pushedActors, (tile, actor) => new { Tile = tile, Actor = actor })
+                                        .Do(o => Map.MoveActorTo(o.Actor, o.Tile));
             }
 
             EndTurn();
